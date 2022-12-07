@@ -24,19 +24,6 @@ class File:
     def get_size(self):
         return self.size
 
-def find_folder_sizes(node):
-    folder_size = 0
-    folder_sizes = []
-    for child in node.children.values():
-        if type(child) == File:
-            folder_size += child.size
-        else:
-            child_folder_sizes = find_folder_sizes(child) 
-            folder_sizes += child_folder_sizes
-            folder_size += sum(child_folder_sizes)
-
-    return [folder_size] + folder_sizes
-
 
 def create_tree(xs):
     root = Dir(None)
