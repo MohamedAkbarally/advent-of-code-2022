@@ -1,3 +1,5 @@
+import functools
+
 class Monkey:
     def __init__(self, spec_str):
         spec = spec_str.splitlines()
@@ -16,34 +18,33 @@ class Monkey:
         b = parse_var(b)
 
         if operator == '*':
-            return a * b
-        if operator == '+':
-            return a + b
-
-    def operation(self, old):
-        a, operator, b = self.operation_formula
-        parse_var = lambda x: old if x == 'old' else int(x)
-
-        a = parse_var(a)
-        b = parse_var(b)
-
-        if operator == '*':
-            return (a*b)%19
+            return (a*b)
         if operator == '+':
             return a + b
     
     def handle_item(self):
         self.inspections += 1
     
-        item = self.operation(self.items.pop(0))
+        item = self.operation(self.items.pop(0))//3
 
         if item%self.diviser == 0:
             return self.true_monkey_num, item
         return self.false_monkey_num, item
 
+class MonkeyP2(Monkey):
+
+    def handle_item(self, common_diviser):
+        self.inspections += 1
+
+        item = self.operation(self.items.pop(0))%common_diviser
+
+        if item%self.diviser == 0:
+            return self.true_monkey_num, item
+        return self.false_monkey_num, item
+    pass
+
 
 def p1(f):
-    return
     xs = f.read().split("\n\n")
     monkeys = [Monkey(x) for x in xs]
     for _ in range(20):
@@ -57,19 +58,16 @@ def p1(f):
 
 def p2(f):
     xs = f.read().split("\n\n")
-    monkeys = [Monkey(x) for x in xs]
+    monkeys = [MonkeyP2(x) for x in xs]
     inspections = [0]* len(monkeys)
-
-    for i in range(10000):
+    common_diviser = functools.reduce(lambda a, b: a*b, [m.diviser for m in monkeys])
+    
+    for _ in range(10000):
         for monkey in monkeys:
             while len(monkey.items) > 0:
-                monkey_num, item = monkey.handle_item()
+                monkey_num, item = monkey.handle_item(common_diviser)
                 monkeys[monkey_num].items.append(item)
 
-        if i == 19:
-            print(sorted([m.inspections for m in monkeys]))
-
     inspections = sorted([m.inspections for m in monkeys])
-    print(inspections)
-    print(inspections[-1]*inspections[-2])
+    return(inspections[-1]*inspections[-2])
 
