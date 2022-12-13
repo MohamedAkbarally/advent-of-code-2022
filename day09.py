@@ -1,11 +1,12 @@
-import math
-
 def is_connected(head, tail):
     x = abs(head[0] - tail[0])
     y = abs(head[1] - tail[1])
 
     if x <= 1 and y <= 1:
         return True
+
+    if x > 2 or y > 2:
+        print("hello")
     return False
 
 def get_head_moves(xs):
@@ -34,13 +35,21 @@ def get_head_moves(xs):
 
 
 def get_tail_moves(head_moves):
-    tail_moves = [(0,0)]
+    tail_moves = []
     for i in range(len(head_moves)):
-        if not is_connected(head_moves[i], tail[-1]):
-            tail = head_moves[i-1]
+        tail = tail_moves[-1] if len(tail_moves) > 0 else (0,0)
+        if not is_connected(head_moves[i],tail):
+            new_tail_x = tail[0]
+            new_tail_y = tail[1]
+            if head_moves[i][0] != tail[0]:
+                new_tail_x+= (1 if tail[0] < head_moves[i][0] else -1)
+            
+            if head_moves[i][1] != tail[1]:
+                new_tail_y +=  (1 if tail[1] < head_moves[i][1] else -1)
+
+            tail = (new_tail_x,new_tail_y)
         tail_moves.append(tail)
 
-    print(tail_moves)
     return tail_moves
 
 
@@ -54,13 +63,10 @@ def p1(f):
 def p2(f):
     xs = f.read().splitlines()
 
-    if len(xs) > 100:
-        return
     head_moves = get_head_moves(xs)
     tail_moves = head_moves
-    
-    
-    for i in range(10):
-        tail_moves = get_tail_moves(tail_moves)
 
+    for i in range(9):
+        tail_moves = get_tail_moves(tail_moves)
+        
     return len(set(tail_moves))
